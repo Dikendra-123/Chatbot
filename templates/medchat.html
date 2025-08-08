@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Medical Chatbot</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Bootstrap & FontAwesome -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css">
+    
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container-fluid h-100">
+    <div class="row justify-content-center h-100">		
+        <div class="col-md-8 col-xl-6 chat">
+            <div class="card">
+                <!-- Header -->
+                <div class="card-header msg_head">
+                    <div class="d-flex bd-highlight">
+                        <div class="img_cont">
+                            <img src="https://cdn-icons-png.flaticon.com/512/387/387569.png" class="rounded-circle user_img">
+                            <span class="online_icon"></span>
+                        </div>
+                        <div class="user_info">
+                            <span style="font-weight:bold; font-size:1.3rem; letter-spacing:1px;">Medical Chatbot</span>
+                            <p>Ask me anything!</p>
+                        </div>
+                    </div>
+                    <!-- Quick Replies Removed -->
+                </div>
+
+                <!-- Chat Body -->
+                <div id="messageFormeight" class="card-body msg_card_body"></div>
+
+                <!-- Footer -->
+                <div class="card-footer">
+                    <form id="messageArea" class="input-group">
+                        <input type="text" id="text" name="msg" placeholder="Type your message..." autocomplete="off" class="form-control type_msg" required/>
+                        <div class="input-group-append">
+                            <!-- Voice button removed -->
+                            <button type="submit" id="send" class="input-group-text send_btn"><i class="fas fa-paper-plane"></i></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JS Logic -->
+<script>
+$(document).ready(function() {
+
+    function appendUserMessage(msg, time) {
+        var userHtml = `<div class="d-flex justify-content-end mb-4">
+            <div class="msg_cotainer_send">${msg}
+                <span class="msg_time_send">${time}</span>
+            </div>
+            <div class="img_cont_msg">
+                <img src="https://i.ibb.co/d5b84Xw/Untitled-design.png" class="rounded-circle user_img_msg">
+            </div>
+        </div>`;
+        $("#messageFormeight").append(userHtml);
+        scrollToBottom();
+    }
+
+    function appendBotMessage(msg, time) {
+        var botHtml = `<div class="d-flex justify-content-start mb-4">
+            <div class="img_cont_msg">
+                <img src="https://cdn-icons-png.flaticon.com/512/387/387569.png" class="rounded-circle user_img_msg">
+            </div>
+            <div class="msg_cotainer">${msg}
+                <span class="msg_time">${time}</span>
+            </div>
+        </div>`;
+        $("#messageFormeight").append(botHtml);
+        scrollToBottom();
+    }
+
+    function scrollToBottom() {
+        $("#messageFormeight").stop().animate({ scrollTop: $("#messageFormeight")[0].scrollHeight}, 500);
+    }
+
+    function appendTypingIndicator() {
+        var typingHtml = `<div class="d-flex justify-content-start mb-4 typing-indicator">
+            <div class="img_cont_msg">
+                <img src="https://cdn-icons-png.flaticon.com/512/387/387569.png" class="rounded-circle user_img_msg">
+            </div>
+            <div class="msg_cotainer">
+                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            </div>
+        </div>`;
+        $("#messageFormeight").append(typingHtml);
+        scrollToBottom();
+    }
+
+    function removeTypingIndicator() {
+        $(".typing-indicator").remove();
+    }
+
+    $("#messageArea").on("submit", function(event) {
+        event.preventDefault();
+        const date = new Date();
+        const str_time = date.getHours() + ":" + String(date.getMinutes()).padStart(2, '0');
+        var rawText = $("#text").val();
+
+        appendUserMessage(rawText, str_time);
+        $("#text").val("");
+
+        appendTypingIndicator();
+
+        $.ajax({
+            data: { msg: rawText },
+            type: "POST",
+            url: "/get",
+        }).done(function(data) {
+            removeTypingIndicator();
+            appendBotMessage(data, str_time);
+        });
+    });
+
+});
+</script>
+</body>
+</html>
