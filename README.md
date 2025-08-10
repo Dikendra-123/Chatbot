@@ -5,25 +5,25 @@
 
 Clone the repository
 
-'''bash
+```bash
 https://github.com/Dikendra-123/Chatbot.git
-'''
+```
 
-###Step-1- Create conda environment after opening repo
+###Step 1- Create conda environment after opening repo
 
-'''bash
+```bash
 conda create -n Chatbot python=3.10 -y
-'''
+```
 
-'''bash
+```bash
 conda activate Chatbot
-'''
+```
 
 ###Step 2- install the requirements
 
-'''bash
+```bash
 pip install -r requirements.txt
-'''
+```
 
 ### Create a `.env` file in the root directory and add your Pinecone & OpenAI credentials as follows:
 
